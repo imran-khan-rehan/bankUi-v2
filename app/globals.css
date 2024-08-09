@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.shadow-custom {
+  box-shadow: 4px 4px 40px 0px rgba(0, 0, 0, 0.05);
+}
+.custom {
+  background-image: url('../public/icons/SENDMONEY/convenient.jpeg');
+  background-size: cover;
+  background-position: right;
+  background-repeat: no-repeat;
+  width: 100%; 
+
+}
+/* styles/globals.css */
+.chart-container {
+  width: 80%;
+  margin: 0 auto;
+}
+.carousel-section{
+  
+  position: relative;
+  align-items: center;
+  text-align: center;
+}
+
+.carousel-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Adjust opacity as needed */
+}
+
+.carousel-section .text-center {
+  position: relative;
+  z-index: 1; /* Ensure the content appears above the overlay */
+  color: white; /* Set text color to white */
+}
