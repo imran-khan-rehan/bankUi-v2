@@ -14,12 +14,14 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [address, setAddress] = useState(''); // New Address field
 
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showPassword1, setShowPassword1] = useState(false);
     const [isValidEmail, setValidEmail] = useState(true);
     const [validName, setValidName] = useState(true);
+    const [validAddress, setValidAddress] = useState(true); // Validation for address
 
     const [matchPassword, setMatchPassword] = useState(true);
     const [isValidPassword, setValidPassword] = useState(true);
@@ -44,6 +46,11 @@ const SignUp = () => {
         setMatchPassword(true);
     };
 
+    const handleAddressChange = (e) => {
+        setAddress(e.target.value);
+        setValidAddress(true);
+    };
+
     const handleSignUp = async (e) => {
         e.preventDefault();
         checkEmail();
@@ -60,29 +67,30 @@ const SignUp = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name, email, password }),
+                    body: JSON.stringify({ name, email, password, address }), // Include address in the request
                 });
 
+                const message = await response.text(); // Get the response message as text
+
                 if (response.ok) {
-                    alert("Account Created !!");
-                    //const data = await response.json();
+                    alert(message); // Display the success message
                     router.push('/login');
                 } else {
-                    const data = await response.json();
-                    if (data.response === 'User already exists') {
-                        setMessageEmail(data.response);
+                    alert(message); // Display the error message
+                    if (message === 'User already exists') {
+                        setMessageEmail(message);
                         setValidEmail(false);
-                    } else {
-                        console.error('Signup failed:', data.response);
                     }
                 }
             } catch (error) {
                 console.error('Error:', error);
+                alert('An unexpected error occurred');
             } finally {
                 setIsLoading(false);
             }
         }
     };
+
 
     const checkEmail = () => {
         const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
@@ -97,9 +105,6 @@ const SignUp = () => {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&`^~#\-_+=<>?.,:;\\'"]{8,}$/;
         setValidPassword(passwordRegex.test(password));
     };
-
-
-
 
     const togglePasswordVisibility = () => {
         setShowPassword(prev => !prev);
@@ -127,16 +132,36 @@ const SignUp = () => {
                             {!validName && (
                                 <div className="flex">
                                     <Image src={warimage} width={20} height={20} alt='warning' className='text-white'></Image>
-                                    <p className='pl-1  text-red-600'>Name cant be empty</p>
+                                    <p className='pl-1  text-red-600'>Name must be at least 3 characters long</p>
                                 </div>
                             )}
                         </div>
                         <input
                             name='name'
                             type="text"
-                            placeholder='john'
+                            placeholder='John'
                             value={name}
                             onChange={(e) => { setName(e.target.value); setValidName(true) }}
+                            required
+                            className="border border-solid border-yellow-500 w-full p-2 rounded-md text-sm font-normal"
+                        />
+                    </div>
+                    <div className="mb-3 font-poppins">
+                        <div className="mb-2 flex justify-between">
+                            <label className="text-black block">Address*</label>
+                            {!validAddress && (
+                                <div className="flex">
+                                    <Image src={warimage} width={20} height={20} alt='warning' className='text-white'></Image>
+                                    <p className='pl-1  text-red-600'>Address must be at least 5 characters long</p>
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            name='address'
+                            type="text"
+                            placeholder='1234 Main St'
+                            value={address}
+                            onChange={handleAddressChange}
                             required
                             className="border border-solid border-yellow-500 w-full p-2 rounded-md text-sm font-normal"
                         />
@@ -191,36 +216,36 @@ const SignUp = () => {
                         </div>
                     </div>
                     <div className="mb-4 font-poppins">
-                        <div className="mb-2 flex justify-between">
-                            <label className="text-black">Confirm Password:</label>
-                            {!matchPassword && (
-                                <div className="flex justify-end text-right">
-                                    <Image src={warimage} width={20} height={20} alt='warning'></Image>
-                                    <p className='ml-1 text-red-600'>Password doesnt match</p>
-                                </div>
-                            )}
-                        </div>
+                        <label className="mb-2 text-black block">Confirm Password:</label>
                         <div className="relative">
                             <input
-                                name='confirmPassword'
+                                name='confirmpassword'
                                 type={showPassword1 ? 'text' : 'password'}
-                                onBlur={checkPasswordMatch}
                                 value={confirmPassword}
                                 placeholder='Confirm your password'
                                 onChange={handleConfirmPasswordChange}
-                                className="border border-solid border-yellow-500 w-full p-2 rounded-md pr-10 text-sm font-normal"
+                                className="border border-solid border-yellow-500 w-full p-2 pr-10 rounded-md text-sm font-normal"
                             />
                             <Image
                                 src={showPassword1 ? eyeslash : eyeimage}
                                 width={18}
                                 height={28}
-                                alt="Show Password"
+                                alt="Show Confirm Password"
                                 className={`absolute top-1/2 transform -translate-y-1/2 right-2 cursor-pointer ${confirmPassword.length >= 1 ? 'block' : 'hidden'}`}
                                 onClick={togglePasswordVisibility1}
                             />
                         </div>
+                        <div className=' h-8'>
+                            {!matchPassword && (
+                                <div className="text-red-800  mt-1">
+                                    Password does not match!
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <Submitbutton message='Sign up' handleSignIn={handleSignUp} />
+                    <div className="flex flex-col items-center justify-center mb-5">
+                        <Submitbutton message={"Create Account"} loading={isLoading} handleSignIn={handleSignUp} />
+                    </div>
                 </div>
             </div>
         </div>

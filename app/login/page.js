@@ -35,16 +35,17 @@ export default function Signin() {
   };
   const handleSignIn = async (e) => {
     e.preventDefault();
+    
     if (!emailRegex.test(email)) {
       setValidCred(false);
       setIsLoading(false);
-      setMessage("wrong Email")
+      setMessage("Invalid Email");
+      return;
     }
-
-    else if (email && password) {
+  
+    if (email && password) {
       setIsLoading(true);
       try {
-
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
           method: "POST",
           headers: {
@@ -52,14 +53,13 @@ export default function Signin() {
           },
           body: JSON.stringify({ email, password }),
         });
-
+  
+        const data = await response.json();
+  
         if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          const { response: token, id, role, accountNumber } = data;
-          alert(accountNumber);
-          login({ email, token, id, accountNumber });
-
+          const { response: token, id, role } = data;
+          login({ email, token, id });
+  
           const setCookieResponse = await fetch('/api/auth/set-cookies', {
             method: 'POST',
             headers: {
@@ -67,7 +67,7 @@ export default function Signin() {
             },
             body: JSON.stringify({ email, token, role }),
           });
-
+  
           if (setCookieResponse.ok) {
             router.push('/user');
           } else {
@@ -75,24 +75,25 @@ export default function Signin() {
           }
         } else {
           setValidCred(false);
-          const message = await response.json();
-          if (message.response === "User does not exist") {
-            setMessage('There is no account on this email');
-          } else if (message.response === "password is wrong") {
-            setMessage('Wrong password');
+          if (data.response === "User does not exist") {
+            setMessage('There is no account associated with this email');
+          } else if (data.response === "Incorrect password") {
+            setMessage('Incorrect password');
+          } else {
+            setMessage('Login failed');
           }
         }
       } catch (error) {
         setMessage('Something went wrong');
-        alert("Something went wrong");
       } finally {
         setIsLoading(false);
       }
     } else {
-      setValidCred(false)
-      setMessage("Email or password cant be empty");
+      setValidCred(false);
+      setMessage("Email or password cannot be empty");
     }
   };
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
