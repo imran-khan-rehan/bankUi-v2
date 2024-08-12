@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import HomeNavBar from '@/components/HomeNavBar';
-
+import bcrypt from 'bcryptjs';
 const SignUp = () => {
     const router = useRouter();
     const [email, setEmail] = useState('');
@@ -62,25 +62,26 @@ const SignUp = () => {
         if (validName && isValidEmail && matchPassword && isValidPassword && password.length > 0) {
             setIsLoading(true);
             try {
+             const hashedPassword = await bcrypt.hash(password, 10);
                 const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ name, email, password, address }), // Include address in the request
+                    body: JSON.stringify({ name, email, password: hashedPassword, address }), // Include address in the request
                 });
 
-                const message = await response.text();
+                const message = await response.text(); // Get the response message as text
 
                 if (response.ok) {
                     alert(message); // Display the success message
                     router.push('/login');
-                } else {
-                    alert(message); // Display the error message
-                    if (message === 'User already exists') {
+                } else if(response.status == 400) {
                         setMessageEmail(message);
                         setValidEmail(false);
-                    }
+                }else if(response.status == 500) {
+                        setMessageEmail(message);
+                        setValidEmail(false);
                 }
             } catch (error) {
                 console.error('Error:', error);

@@ -88,7 +88,7 @@ const AdminBalancesPage = () => {
 
   const fetchBalances = async (token) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/balance/all`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/accounts`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',

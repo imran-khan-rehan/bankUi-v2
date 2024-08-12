@@ -18,25 +18,25 @@ const Home = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       const data = sessionStorage.getItem('user');
-
       if (data) {
         user = JSON.parse(data);
         setToken(user.token);
-       console.log(user.token);
-        // Fetch balance by user ID
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/balance/${user.id}`, {
+        console.log(user.token);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/accounts/users/${user.id}`, {
           method: "GET",
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${user.token}`
           },
         });
+
         console.log(response);
         if (response.ok) {
           const balanceData = await response.json();
+    
           console.log(balanceData);
-          setBalance(balanceData.amount);
-          setAccount(balanceData.accountHolder.accountNumber);
+          setBalance(balanceData.balance);
+          setAccount(balanceData.accountNumber);
         } else {
           console.error("Failed to fetch balance");
         }
@@ -64,7 +64,6 @@ const Home = () => {
           Your balance is: ${balance}
         </div>
       )}
-      {/* Conditionally render the MoneyChart */}
       <MoneyChart />
 
 

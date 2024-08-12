@@ -21,7 +21,7 @@ const AdminUsersPage = () => {
   const fetchUsers = async (token) => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/alls`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',
@@ -30,6 +30,7 @@ const AdminUsersPage = () => {
       });
       if (response.ok) {
         const data = await response.json();
+        alert(data.length);
         setUsers(data);
       } else {
         console.error('Failed to fetch users');
@@ -110,7 +111,7 @@ const AdminUsersPage = () => {
             return (
               <tr key={user.id}>
                 <td className="py-2 px-4 border-b text-center">{index + 1}</td>
-                <td className="py-2 px-4 border-b text-center">{user.accountNumber}</td>
+                {/* <td className="py-2 px-4 border-b text-center">{user.accountNumber}</td> */}
                 <td className="py-2 px-4 border-b text-center">{user.name}</td>
                 <td className="py-2 px-4 border-b text-center">{user.email}</td>
                 <td className="py-2 px-4 border-b text-center">{user.role}</td>

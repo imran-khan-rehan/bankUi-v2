@@ -26,7 +26,7 @@ export default function TransactionHistory() {
     const fetchTransactions = async () => {
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/all`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions`, {
           method: "GET",
           headers: {
             'Content-Type': 'application/json',

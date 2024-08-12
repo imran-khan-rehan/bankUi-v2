@@ -12,29 +12,28 @@ function TransferMoney() {
 
     const handleTransfer = async (e) => {
         e.preventDefault();
-    
+
         if (!user || !user.token) {
             setError("User is not authenticated. Please log in again.");
             return;
         }
-        
+
         // Validate accountNumber
         const accountNumberValue = accountNumber.toString();
         if (!/^\d+$/.test(accountNumberValue)) {
             setError("Error: Account number must contain only digits.");
             return;
         }
-        
+
         if (accountNumberValue.length < 10) {
             setError("Error: Account number must be at least 10 digits long.");
             return;
         }
-        
+
         if (user.accountNumber === accountNumber) {
             setError("Error: Sender and receiver accounts cannot be the same.");
             return;
         }
-        
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions`, {
                 method: "POST",
@@ -49,16 +48,15 @@ function TransferMoney() {
                     date: new Date().toISOString()
                 })
             });
-    
+
             if (response.ok) {
                 const transaction = await response.json();
-                setSuccessMessage(`Successfully transferred $${transaction.amount} to account ${accountNumberValue}.`);
+                setSuccessMessage(`Successfully transferred $${amount} to account ${accountNumberValue}.`);
                 setError(null);
-            } else if (response.status === 404) {
-                setError("There is no user with this account number.");
-                setSuccessMessage(null);
             } else {
-                setError("Error: Balance insufficient.");
+                const errorData = await response.text(); // Read the response text or json for error details
+
+                setError(errorData);
                 setSuccessMessage(null);
             }
         } catch (error) {
@@ -66,8 +64,9 @@ function TransferMoney() {
             setError("An error occurred. Please try again.");
             setSuccessMessage(null);
         }
+
     };
-    
+
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-center p-5">

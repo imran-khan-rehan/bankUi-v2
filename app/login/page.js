@@ -4,7 +4,6 @@
 import React, { useState, useContext } from 'react';
 import eyeImage from '@/public/icons/eye-slash.svg';
 import eyeSlash from '@/public/icons/eye-slash.svg';
-import Submitbutton from '@/components/submitbutton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '@/context/UserContext';
@@ -56,8 +55,12 @@ export default function Signin() {
 
 
         if (response.ok) {
+          console.log(response);
+          const token = response.headers.get('Authorization'); // Extract the original token directly from the heade
           const data = await response.json();
-          const { response: token, id, role } = data;
+
+          const { id, role } = data;
+
           login({ email, token, id });
 
           const setCookieResponse = await fetch('/api/auth/set-cookies', {
@@ -74,12 +77,11 @@ export default function Signin() {
             setMessage('Failed to set cookies');
           }
         } else {
-          const message = await response.text();
           setValidCred(false);
-          if (response.status == 404 && message == "User does not exist") {
+          if (response.status == 404) {
             setMessage('There is no account associated with this email');
           }
-          else if (response.status == 401 && message === "Incorrect password") {
+          else if (response.status == 401) {
             setMessage('Incorrect password');
           } else {
             setMessage('Login failed');

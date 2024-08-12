@@ -48,11 +48,11 @@ const NavBar = () => {
 
       if (response.ok) {
         const data = await response.json();
+        
         setProfileData({
-          id: data.id,
           name: data.name,
           email: data.email,
-          password: data.password,
+          address: data.address
         });
       } else {
         console.error('Failed to fetch profile data');
@@ -113,20 +113,20 @@ const NavBar = () => {
       }
       setValidEmail(true);
 
-      if (editPassword.newPassword !== "" && !validatePassword(editPassword.newPassword)) {
-        setError("Password must be at least 8 characters long and must include letters and digits.");
-        setValidPassword(false);
-        setLoading(false);
-        return;
-      }
+      // if (editPassword.newPassword !== "" && !validatePassword(editPassword.newPassword)) {
+      //   setError("Password must be at least 8 characters long and must include letters and digits.");
+      //   setValidPassword(false);
+      //   setLoading(false);
+      //   return;
+      // }
       setValidPassword(true);
 
-      const passwordMatch = await bcrypt.compare(editPassword.oldPassword, profileData.password);
-      if (editPassword.newPassword !== "" && !passwordMatch) {
-        setError("Old password is incorrect.");
-        setLoading(false);
-        return;
-      }
+      // const passwordMatch = await bcrypt.compare(editPassword.oldPassword, profileData.password);
+      // if (editPassword.newPassword !== "" && !passwordMatch) {
+      //   setError("Old password is incorrect.");
+      //   setLoading(false);
+      //   return;
+      // }
 
       if (profileData.name.trim().length === 0 || profileData.email.trim().length === 0) {
         setError("Name or email can't be empty.");
@@ -137,14 +137,15 @@ const NavBar = () => {
       const updatedData = {
         name: profileData.name,
         email: profileData.email,
+        address: profileData.address
       };
 
-      if (editPassword.newPassword !== "") {
-        updatedData.password = await bcrypt.hash(editPassword.newPassword, 10);
-      }
+      // if (editPassword.newPassword !== "") {
+      //   updatedData.password = await bcrypt.hash(editPassword.newPassword, 10);
+      // }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -155,20 +156,24 @@ const NavBar = () => {
       if (response.ok) {
         const data = await response.json();
         setProfileData({
-          id: data.id,
           name: data.name,
           email: data.email,
-          password: data.password,
+          address: data.address
         });
 
         setIsEditMode(false);
         setError(null);
       } else if (response.status === 409) {
         setError('Email already exists.');
-      } else {
+      } else if(response.status === 404)
+      {
+        setError("invalid user");
+      }
+      else {
         setError('Failed to update profile.');
       }
     } catch (error) {
+      setError("error");
       console.error('Error updating profile data:', error);
     } finally {
       setLoading(false);
@@ -254,6 +259,17 @@ const NavBar = () => {
                     {/* {!isValidEmail && <div className="text-red-500">Invalid email format.</div>} */}
                   </div>
                   <div>
+                    <label className="block text-gray-700">Address</label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={profileData.address}
+                      onChange={handleInputChange}
+                      className="w-full mt-1 p-2 border border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  {/* <div>
                     <label className="block text-gray-700">Old Password</label>
                     <input
                       type="password"
@@ -272,20 +288,21 @@ const NavBar = () => {
                       onChange={handlePasswordChange}
                       className="w-full mt-1 p-2 border border-gray-300 rounded"
                     />
-                  </div>
+                  </div> */}
                   {loading && <div className="text-red-500">Loading ...</div>}
                   {error && <div className="text-red-500">{error}</div>}
                 </>
               ) : (
                 <>
-                  <div>
-                    <strong>ID:</strong> {profileData.id}
-                  </div>
+
                   <div>
                     <strong>Name:</strong> {profileData.name}
                   </div>
                   <div>
                     <strong>Email:</strong> {profileData.email}
+                  </div>
+                  <div>
+                    <strong>Address:</strong> {profileData.address}
                   </div>
                 </>
               )}

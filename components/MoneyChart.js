@@ -31,7 +31,7 @@ const MoneyChart = () => {
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/${user.id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/users/${user.id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

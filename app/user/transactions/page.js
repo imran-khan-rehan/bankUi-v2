@@ -31,7 +31,7 @@ export default function TransactionHistory() {
       // }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/${user.id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/transactions/users/${user.id}`, {
           method: "GET",
           headers: {
             'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export default function TransactionHistory() {
               className={`${colorClass} p-5 rounded-md shadow-lg transition-transform transform hover:scale-105`}
             >
               <div className="flex items-center mb-3">
-                <span className="text-lg font-bold mr-2">{isSent ? transaction.receiver.name : transaction.sender.name }</span>
+                <span className="text-lg font-bold mr-2">{isSent ? transaction.receiver.accountHolder.name : transaction.sender.accountHolder.name}</span>
                 {icon}
               </div>
               <div className="flex justify-between mb-3">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import bcrypt from 'bcryptjs';
 
 const UserEditModal = ({ user, isOpen, onClose, onSave, token, isEdit }) => {
     const initialFormData = {
@@ -64,6 +65,8 @@ const UserEditModal = ({ user, isOpen, onClose, onSave, token, isEdit }) => {
         }
 
         try {
+            const hashedPassword = await bcrypt.hash(formData.password, 10);
+            formData.password=hashedPassword;
             const response = await fetch(
                 isEdit
                     ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${user.id}`
