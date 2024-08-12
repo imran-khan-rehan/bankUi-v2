@@ -70,7 +70,7 @@ const SignUp = () => {
                     body: JSON.stringify({ name, email, password, address }), // Include address in the request
                 });
 
-                const message = await response.text(); // Get the response message as text
+                const message = await response.text();
 
                 if (response.ok) {
                     alert(message); // Display the success message

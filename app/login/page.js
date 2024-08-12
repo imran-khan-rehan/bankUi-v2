@@ -35,14 +35,14 @@ export default function Signin() {
   };
   const handleSignIn = async (e) => {
     e.preventDefault();
-    
+
     if (!emailRegex.test(email)) {
       setValidCred(false);
       setIsLoading(false);
       setMessage("Invalid Email");
       return;
     }
-  
+
     if (email && password) {
       setIsLoading(true);
       try {
@@ -53,13 +53,13 @@ export default function Signin() {
           },
           body: JSON.stringify({ email, password }),
         });
-  
-        const data = await response.json();
-  
+
+
         if (response.ok) {
+          const data = await response.json();
           const { response: token, id, role } = data;
           login({ email, token, id });
-  
+
           const setCookieResponse = await fetch('/api/auth/set-cookies', {
             method: 'POST',
             headers: {
@@ -67,23 +67,26 @@ export default function Signin() {
             },
             body: JSON.stringify({ email, token, role }),
           });
-  
+
           if (setCookieResponse.ok) {
             router.push('/user');
           } else {
             setMessage('Failed to set cookies');
           }
         } else {
+          const message = await response.text();
           setValidCred(false);
-          if (data.response === "User does not exist") {
+          if (response.status == 404 && message == "User does not exist") {
             setMessage('There is no account associated with this email');
-          } else if (data.response === "Incorrect password") {
+          }
+          else if (response.status == 401 && message === "Incorrect password") {
             setMessage('Incorrect password');
           } else {
             setMessage('Login failed');
           }
         }
       } catch (error) {
+        setValidCred(false);
         setMessage('Something went wrong');
       } finally {
         setIsLoading(false);
@@ -93,7 +96,7 @@ export default function Signin() {
       setMessage("Email or password cannot be empty");
     }
   };
-  
+
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -149,7 +152,7 @@ export default function Signin() {
               {message}
             </div>
           </div>
-          <div 
+          <div
             className={` flex flex-row items-center justify-between w-full bg-yellow-500 rounded-md cursor-pointer`}>
             <button onClick={handleSignIn}
               className="text-white text-center py-2 flex-grow text-lg font-semibold">
